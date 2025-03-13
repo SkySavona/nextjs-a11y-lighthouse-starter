@@ -2,13 +2,17 @@
   "name": "a11y-jest-axe-testing",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "jest --watch"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "test": "jest --watch",
+  "test:a11y": "jest --testPathPattern=__tests__/a11y",
+  "test:a11y:ci": "jest --testPathPattern=__tests__/a11y --no-watch",
+  "test:a11y:report": "jest --testPathPattern=__tests__/a11y --json --outputFile=./a11y-report.json",
+  "lighthouse": "lhci autorun"
+},
   "dependencies": {
     "next": "15.2.2",
     "react": "^19.0.0",
@@ -18,7 +22,6 @@
     "@eslint/eslintrc": "^3",
     "@swc/core": "^1.11.9",
     "@swc/jest": "^0.2.37",
-    "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/jest": "^29.5.14",
@@ -35,7 +38,7 @@
     "jest-axe": "^10.0.0",
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.5.3",
-    "tailwindcss": "^3.3.5",
+    "tailwindcss": "^3.4.17",
     "ts-jest": "^29.2.6",
     "typescript": "^5"
   },
