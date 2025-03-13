@@ -12,7 +12,8 @@ export default function Home() {
       <p className="mb-4">
         This is a basic template for an accessible Next.js application.
       </p>
-      <AccessibleButton label={''} >
+      <button className='text-white bg-red-500 '>HELLO WORLD</button>
+      <AccessibleButton label={'Hello World'} >
   
      </AccessibleButton> 
     </main>
