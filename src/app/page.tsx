@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import AccessibleButton from './components/ui/AccessibleButton';
 
 export default function Home() {
   return (
@@ -11,12 +12,9 @@ export default function Home() {
       <p className="mb-4">
         This is a basic template for an accessible Next.js application.
       </p>
-      <button 
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        aria-label="Learn more about accessibility"
-      >
-        Learn More
-      </button>
+      <AccessibleButton label={''} >
+  
+     </AccessibleButton> 
     </main>
   );
 }
