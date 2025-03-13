@@ -2,16 +2,17 @@
   "name": "a11y-jest-axe-testing",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "jest --watch",
-    "test:a11y": "jest --testPathPattern=__tests__/a11y",
-    "test:a11y:report": "jest --testPathPattern=__tests__/a11y --json --outputFile=./a11y-report.json",
-    "lighthouse": "lhci autorun"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "test": "jest --watch",
+  "test:a11y": "jest --testPathPattern=__tests__/a11y",
+  "test:a11y:ci": "jest --testPathPattern=__tests__/a11y --no-watch",
+  "test:a11y:report": "jest --testPathPattern=__tests__/a11y --json --outputFile=./a11y-report.json",
+  "lighthouse": "lhci autorun"
+},
   "dependencies": {
     "next": "15.2.2",
     "react": "^19.0.0",

@@ -2,6 +2,8 @@
 
 A comprehensive starter template for Next.js 15 applications with built-in accessibility testing using Jest-axe and performance testing with Lighthouse CI.
 
+![Accessibility Tests](https://github.com/SkySavona/nextjs-a11y-lighthouse-starter/actions/workflows/accessibility-performance.yml/badge.svg)
+
 ## Features
 
 - ✅ **Next.js 15**: Latest Next.js framework with App Router

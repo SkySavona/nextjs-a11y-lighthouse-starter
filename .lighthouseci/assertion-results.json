@@ -1,49 +1,15 @@
 [
   {
-    "name": "minScore",
-    "expected": 0.7,
-    "actual": null,
-    "values": [
-      null,
-      null,
-      null
-    ],
-    "operator": ">=",
-    "passed": false,
-    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
-    "auditProperty": "performance",
-    "auditId": "categories",
-    "level": "error",
-    "url": "http://localhost:3000/"
-  },
-  {
-    "name": "minScore",
-    "expected": 0.9,
-    "actual": 0.77,
-    "values": [
-      0.77,
-      0.77,
-      0.77
-    ],
-    "operator": ">=",
-    "passed": false,
-    "auditProperty": "accessibility",
-    "auditId": "categories",
-    "level": "error",
-    "url": "http://localhost:3000/"
-  },
-  {
     "name": "maxNumericValue",
     "expected": 3500,
-    "actual": null,
+    "actual": 8622.2788,
     "values": [
-      null,
-      null,
-      null
+      8622.2788,
+      8678.5192,
+      8681.3998
     ],
     "operator": "<=",
     "passed": false,
-    "message": "Audit did not produce a value at all. \"maxNumericValue\" might not be a valid assertion for this audit.",
     "auditId": "interactive",
     "level": "error",
     "url": "http://localhost:3000/",
@@ -61,10 +27,10 @@
     ],
     "operator": ">=",
     "passed": false,
-    "auditId": "document-title",
+    "auditId": "color-contrast",
     "level": "error",
     "url": "http://localhost:3000/",
-    "auditTitle": "Document doesn't have a `<title>` element",
-    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.9/document-title"
+    "auditTitle": "Background and foreground colors do not have a sufficient contrast ratio.",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.9/color-contrast"
   }
 ]
