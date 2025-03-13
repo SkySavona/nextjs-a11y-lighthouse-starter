@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Added permissions for GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   accessibility-test:
     name: Accessibility Tests
@@ -136,6 +142,14 @@ jobs:
             repo: context.repo.repo,
             body: commentBody
           });
+    
+    - name: Upload Lighthouse artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lighthouse-results
+        path: ./.lighthouseci/
+        retention-days: 30
           
   publish-reports:
       name: Publish Reports
@@ -157,6 +171,9 @@ jobs:
         - name: Create index page
           run: |
             mkdir -p reports
+            echo "Available artifacts:" > reports/debug.txt
+            ls -la reports >> reports/debug.txt
+            
             cat > reports/index.html << EOF
             <!DOCTYPE html>
             <html>
@@ -174,12 +191,16 @@ jobs:
             <body>
               <h1>Test Reports for Latest Build</h1>
               <div class="report-section">
+                <h2>Debug Information</h2>
+                <a class="report-link" href="./debug.txt">Directory Structure</a>
+              </div>
+              <div class="report-section">
                 <h2>Accessibility Reports</h2>
-                <a class="report-link" href="./accessibility-report.json">Accessibility Report (JSON)</a>
+                <a class="report-link" href="./accessibility-report/a11y-report.json">Accessibility Report (JSON)</a>
               </div>
               <div class="report-section">
                 <h2>Lighthouse Reports</h2>
-                <a class="report-link" href="./lighthouse/manifest.html">Lighthouse Reports</a>
+                <a class="report-link" href="./lighthouse-results/manifest.json">Lighthouse Results (JSON)</a>
               </div>
             </body>
             </html>
