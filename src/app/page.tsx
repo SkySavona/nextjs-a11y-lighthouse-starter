@@ -9,7 +9,7 @@ export default function Home() {
         <p className="text-white mb-4">
         This is a paragraph with Tailwind CSS styles applied.
         </p>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button className="bg-white  text-black font-bold py-2 px-4 rounded">
           Test Button
         </button>
       </div>

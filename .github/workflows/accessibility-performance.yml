@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main, develop ]
 
-# Added permissions for GitHub Pages
+
 permissions:
   contents: read
   pages: write
@@ -152,103 +152,100 @@ jobs:
         retention-days: 30
           
   publish-reports:
-      name: Publish Reports
-      runs-on: ubuntu-latest
-      needs: [accessibility-test, lighthouse-test]
-      if: always()
-      permissions:
-        pages: write
-        id-token: write
-      steps:
-        - name: Download all artifacts
-          uses: actions/download-artifact@v4
-          with:
-            path: reports
-        
-        - name: Setup Pages
-          uses: actions/configure-pages@v4
-        
-        - name: Create index page
-          run: |
-            mkdir -p reports
-            echo "Available artifacts:" > reports/debug.txt
-            ls -la reports >> reports/debug.txt
-            
-            # Find the actual Lighthouse report URLs
-            if [ -f "reports/lighthouse-results/manifest.json" ]; then
-              echo "Found Lighthouse manifest" >> reports/debug.txt
-              REPORT_URL=$(cat reports/lighthouse-results/manifest.json | grep -o 'https://storage.googleapis.com/[^"]*' | head -1)
-              echo "Report URL: $REPORT_URL" >> reports/debug.txt
-            else
-              echo "Lighthouse manifest not found" >> reports/debug.txt
-            fi
-            
-            cat > reports/index.html << EOF
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Test Reports</title>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1">
-              <style>
-                body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-                h1 { color: #333; }
-                .report-section { margin-bottom: 30px; }
-                .report-link { display: block; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
-              </style>
-            </head>
-            <body>
-              <h1>Test Reports for Latest Build</h1>
-              <div class="report-section">
-                <h2>Debug Information</h2>
-                <a class="report-link" href="./debug.txt">Directory Structure</a>
-              </div>
-              <div class="report-section">
-                <h2>Accessibility Reports</h2>
-                <a class="report-link" href="./accessibility-report/a11y-report.json">Accessibility Report (JSON)</a>
-              </div>
-              <div class="report-section">
-                <h2>Lighthouse Reports</h2>
-                <p>Lighthouse reports are hosted externally. Click the links below to view them:</p>
-                <div id="lighthouse-links">Loading...</div>
-              </div>
-            </body>
-            <script>
-              // This script will run on page load to load and display the Lighthouse report links
-              window.addEventListener('DOMContentLoaded', async () => {
-                try {
-                  const response = await fetch('./lighthouse-results/manifest.json');
-                  if (!response.ok) {
-                    document.getElementById('lighthouse-links').innerHTML = 'Error loading Lighthouse reports.';
-                    return;
-                  }
-                  
-                  const data = await response.json();
-                  if (!data || !data.length) {
-                    document.getElementById('lighthouse-links').innerHTML = 'No Lighthouse reports found.';
-                    return;
-                  }
-                  
-                  const linksHtml = data.map(item => {
-                    return \`<a class="report-link" href="\${item.url}" target="_blank">
-                      Report for \${item.url.split('/').pop()} - Performance: \${Math.round(item.summary.performance * 100)}%
-                    </a>\`;
-                  }).join('');
-                  
-                  document.getElementById('lighthouse-links').innerHTML = linksHtml || 'No report links found';
-                } catch (error) {
-                  document.getElementById('lighthouse-links').innerHTML = \`Error: \${error.message}\`;
-                }
-              });
-            </script>
-            </html>
-            EOF
+    name: Publish Reports
+    runs-on: ubuntu-latest
+    needs: [accessibility-test, lighthouse-test]
+    if: always()
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: reports
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Create index page
+        run: |
+          mkdir -p reports
+          echo "Available artifacts:" > reports/debug.txt
+          ls -la reports >> reports/debug.txt
           
-            - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
-              with:
-                path: 'reports'
-            
-            - name: Deploy to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v4
+          cat > reports/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Test Reports</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+              h1 { color: #333; }
+              .report-section { margin-bottom: 30px; }
+              .report-link { display: block; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+            </style>
+          </head>
+          <body>
+            <h1>Test Reports for Latest Build</h1>
+            <div class="report-section">
+              <h2>Debug Information</h2>
+              <a class="report-link" href="./debug.txt">Directory Structure</a>
+            </div>
+            <div class="report-section">
+              <h2>Accessibility Reports</h2>
+              <a class="report-link" href="./accessibility-report/a11y-report.json">Accessibility Report (JSON)</a>
+            </div>
+            <div class="report-section">
+              <h2>Lighthouse Reports</h2>
+              <p>Lighthouse reports are hosted externally. View the latest report:</p>
+              <div id="lighthouse-links">Loading Lighthouse reports...</div>
+            </div>
+          </body>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              fetch('./lighthouse-results/manifest.json')
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('Failed to load manifest');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  if (!data || !Array.isArray(data) || data.length === 0) {
+                    throw new Error('No reports found');
+                  }
+                  
+                  const container = document.getElementById('lighthouse-links');
+                  container.innerHTML = '';
+                  
+                  data.forEach(report => {
+                    if (report.url) {
+                      const link = document.createElement('a');
+                      link.href = report.url;
+                      link.className = 'report-link';
+                      link.target = '_blank';
+                      link.textContent = `Lighthouse Report (${new Date().toLocaleDateString()})`;
+                      container.appendChild(link);
+                    }
+                  });
+                })
+                .catch(error => {
+                  document.getElementById('lighthouse-links').innerHTML = 
+                    '<a class="report-link" href="https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/" target="_blank">View Latest Reports on Google Storage</a><p>Error: ' + error.message + '</p>';
+                });
+            });
+          </script>
+          </html>
+          EOF
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'reports'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
