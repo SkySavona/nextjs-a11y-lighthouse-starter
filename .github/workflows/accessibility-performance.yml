@@ -174,6 +174,15 @@ jobs:
             echo "Available artifacts:" > reports/debug.txt
             ls -la reports >> reports/debug.txt
             
+            # Find the actual Lighthouse report URLs
+            if [ -f "reports/lighthouse-results/manifest.json" ]; then
+              echo "Found Lighthouse manifest" >> reports/debug.txt
+              REPORT_URL=$(cat reports/lighthouse-results/manifest.json | grep -o 'https://storage.googleapis.com/[^"]*' | head -1)
+              echo "Report URL: $REPORT_URL" >> reports/debug.txt
+            else
+              echo "Lighthouse manifest not found" >> reports/debug.txt
+            fi
+            
             cat > reports/index.html << EOF
             <!DOCTYPE html>
             <html>
@@ -200,17 +209,46 @@ jobs:
               </div>
               <div class="report-section">
                 <h2>Lighthouse Reports</h2>
-                <a class="report-link" href="./lighthouse-results/manifest.json">Lighthouse Results (JSON)</a>
+                <p>Lighthouse reports are hosted externally. Click the links below to view them:</p>
+                <div id="lighthouse-links">Loading...</div>
               </div>
             </body>
+            <script>
+              // This script will run on page load to load and display the Lighthouse report links
+              window.addEventListener('DOMContentLoaded', async () => {
+                try {
+                  const response = await fetch('./lighthouse-results/manifest.json');
+                  if (!response.ok) {
+                    document.getElementById('lighthouse-links').innerHTML = 'Error loading Lighthouse reports.';
+                    return;
+                  }
+                  
+                  const data = await response.json();
+                  if (!data || !data.length) {
+                    document.getElementById('lighthouse-links').innerHTML = 'No Lighthouse reports found.';
+                    return;
+                  }
+                  
+                  const linksHtml = data.map(item => {
+                    return \`<a class="report-link" href="\${item.url}" target="_blank">
+                      Report for \${item.url.split('/').pop()} - Performance: \${Math.round(item.summary.performance * 100)}%
+                    </a>\`;
+                  }).join('');
+                  
+                  document.getElementById('lighthouse-links').innerHTML = linksHtml || 'No report links found';
+                } catch (error) {
+                  document.getElementById('lighthouse-links').innerHTML = \`Error: \${error.message}\`;
+                }
+              });
+            </script>
             </html>
             EOF
-        
-        - name: Upload artifact
-          uses: actions/upload-pages-artifact@v3
-          with:
-            path: 'reports'
-        
-        - name: Deploy to GitHub Pages
-          id: deployment
-          uses: actions/deploy-pages@v4
+          
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                path: 'reports'
+            
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
